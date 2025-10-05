@@ -1,20 +1,18 @@
 {
-    "name": "aapp-lab-cdk",
-    "private": true,
-    "type": "module",
-    "devDependencies": {
-      "aws-cdk-lib": "^2.150.0",
-      "constructs": "^10.3.0",
-      "esbuild": "^0.23.0",
-      "typescript": "^5.4.0",
-      "@types/node": "^20.10.0"
-    },
-    "scripts": {
-      "build": "tsc",
-      "cdk": "cdk",
-      "deploy": "npm run build && cdk deploy",
-      "destroy": "cdk destroy",
-      "bootstrap": "cdk bootstrap"
-    }
+  "name": "aapp-lab-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.569.0",
+    "@aws-sdk/lib-dynamodb": "^3.569.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.134",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.4.0"
+  },
+  "scripts": {
+    "build": "tsc"
   }
-  
+}
