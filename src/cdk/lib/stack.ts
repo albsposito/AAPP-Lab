@@ -2,7 +2,7 @@ import { Stack, StackProps, RemovalPolicy, Duration, CfnOutput } from 'aws-cdk-l
 import { Construct } from 'constructs';
 import { Bucket, BlockPublicAccess } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
-import { Runtime } from 'aws-cdk-lib/aws-lambda';
+import { Runtime, FunctionUrlAuthType, HttpMethod } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Table, AttributeType, BillingMode } from 'aws-cdk-lib/aws-dynamodb';
 import * as path from 'node:path';
@@ -33,10 +33,10 @@ export class AappLabStack extends Stack {
     table.grantReadWriteData(fn);
 
     const fnUrl = fn.addFunctionUrl({
-      authType: 'NONE', // public for simplicity; restrict later if needed
+      authType: FunctionUrlAuthType.NONE, // public for simplicity; restrict later if needed
       cors: {
         allowedOrigins: ['*'],
-        allowedMethods: [ 'GET', 'POST', 'OPTIONS' ],
+        allowedMethods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS],
         allowedHeaders: ['*']
       }
     });
@@ -53,7 +53,18 @@ export class AappLabStack extends Stack {
     // Deploy frontend build (from ../frontend/dist) to S3
     new BucketDeployment(this, 'DeployWebsite', {
       destinationBucket: siteBucket,
-      sources: [Source.asset(path.resolve(__dirname, '../../frontend/dist'))]
+      sources: [
+        Source.asset(path.resolve(__dirname, '../../frontend/dist')),
+        Source.data(
+          'runtime-config.js',
+          [
+            'window.__APP_CONFIG__ = Object.assign(window.__APP_CONFIG__ || {}, {',
+            `  backendUrl: '${fnUrl.url}'`,
+            '});',
+            ''
+          ].join('\n')
+        )
+      ]
     });
 
     new CfnOutput(this, 'WebsiteURL', { value: siteBucket.bucketWebsiteUrl });
