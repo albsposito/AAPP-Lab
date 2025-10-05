@@ -22,7 +22,7 @@ export class AappLabStack extends Stack {
     // Lambda backend with a Function URL
     // Can be enhanced with an API Gateway for improved routing
     const fn = new NodejsFunction(this, 'Backend', {
-      entry: path.join(process.cwd(), '../backend/handler.ts'),
+      entry: path.resolve(__dirname, '../../backend/handler.ts'),
       runtime: Runtime.NODEJS_20_X,
       memorySize: 256,
       timeout: Duration.seconds(10),
@@ -53,7 +53,7 @@ export class AappLabStack extends Stack {
     // Deploy frontend build (from ../frontend/dist) to S3
     new BucketDeployment(this, 'DeployWebsite', {
       destinationBucket: siteBucket,
-      sources: [Source.asset(path.join(process.cwd(), '../frontend/dist'))]
+      sources: [Source.asset(path.resolve(__dirname, '../../frontend/dist'))]
     });
 
     new CfnOutput(this, 'WebsiteURL', { value: siteBucket.bucketWebsiteUrl });
